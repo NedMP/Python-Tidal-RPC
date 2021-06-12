@@ -9,7 +9,7 @@ def openUrl(func):
 def nowPlaying():
     while True:
         try:
-            windows = pywinauto.Desktop(backend="uia").windows(process=20024)
+            windows = pywinauto.Desktop(backend="uia").windows(process=13476)
             title, artist = windows[0].window_text().split(" - ")
             return title, artist
         except ValueError:
@@ -49,13 +49,19 @@ while True:
         if nowPlaying()[0] != title:
             title, artist = nowPlaying()
             playing = f"Now playing: {title} - {artist}"
-            track, album = getInfo(title, artist)
-            today = datetime.datetime.today()
-            startTime = datetime.datetime.now().timestamp()
-            endTime = startTime + track.duration
-            print(playing)
-            print("=" * len(playing), end="\n\n")
-            RPC.update(pid=20024, state=artist, details=title, start=int(startTime), end=int(endTime), large_image="artasset1", buttons=important.buttons)
+            try:
+                track, album = getInfo(title, artist)
+                today = datetime.datetime.today()
+                startTime = datetime.datetime.now().timestamp()
+                endTime = startTime + track.duration
+                print(playing)
+                print("=" * len(playing), end="\n\n")
+                RPC.update(state=artist, details=title, start=int(startTime), end=int(endTime), large_image="artasset1", buttons=important.buttons)
+            except TypeError:
+                print("ERROR! Type Error...")
+                print("=" * 20, end="\n\n")
+                RPC.update(state="- Ned Perkins", details='"Error! I\'ll fix this one day."', large_image="sadpepe", buttons=important.buttons)
+                time.sleep(1)
         else:
             time.sleep(1)
     except KeyboardInterrupt:
